@@ -20,13 +20,13 @@ jobs:
     - name: Install zstd
       run: sudo apt-get update && sudo apt-get install -y zstd
 
-    - name: Pull CentOS Stream 10 image
-      run: docker pull dokken/centos-stream-10
+    - name: Pull CentOS Stream 10 ARM64 image
+      run: docker pull --platform linux/arm64 dokken/centos-stream-10
 
     - name: Create rootfs tarball
       run: |
-        # Create a container from the image
-        container_id=$(docker create dokken/centos-stream-10)
+        # Create a container from the ARM64 image
+        container_id=$(docker create --platform linux/arm64 dokken/centos-stream-10)
 
         # Export the container's filesystem to a tar file
         docker export $container_id -o centos-stream-10-rootfs.tar
