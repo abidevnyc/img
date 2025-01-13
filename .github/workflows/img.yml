@@ -1,0 +1,38 @@
+name: Docker Image to RootFS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v2
+
+    - name: Pull CentOS Stream 10 image
+      run: docker pull dokken/centos-stream-10
+
+    - name: Create rootfs tarball
+      run: |
+        # Create a container from the image
+        container_id=$(docker create dokken/centos-stream-10)
+
+        # Export the container's filesystem to a tar file
+        docker export $container_id -o centos-stream-10-rootfs.tar
+
+        # Clean up the container
+        docker rm $container_id
+
+    - name: Upload rootfs tarball as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: centos-stream-10-rootfs
+        path: centos-stream-10-rootfs.tar
